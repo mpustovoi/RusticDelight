@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cooked_calamari"
+        "recipes": "rusticdelight:cooked_calamari"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

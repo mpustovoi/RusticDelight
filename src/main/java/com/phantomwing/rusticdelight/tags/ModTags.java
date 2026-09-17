@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
@@ -59,6 +60,19 @@ public class ModTags {
 
         private static TagKey<Item> tag(String name) {
             return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
+        }
+    }
+
+    /**
+     * Recipe tags. 26.3 made recipes a datapack registry and the crafted-item advancement trigger now
+     * takes a set of recipes; a tag is the only form of that set an advancement can name, since the
+     * advancement provider cannot resolve recipes another provider is still writing.
+     */
+    public static class Recipes {
+        public static final TagKey<Recipe<?>> STRING_FROM_COTTON = tag("string_from_cotton");
+
+        private static TagKey<Recipe<?>> tag(String name) {
+            return TagKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
         }
     }
 }

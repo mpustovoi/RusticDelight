@@ -16,12 +16,14 @@ import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.advancements.triggers.RecipeCraftedTrigger;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -38,6 +40,16 @@ public class ModAdvancements extends FabricAdvancementProvider {
     // 1.21.11 resolves item predicates through a HolderGetter rather than raw items.
     private HolderGetter<Item> itemGetter;
 
+    /**
+     * 26.3 made recipes a datapack registry and the crafted-item trigger now takes a HolderSet of
+     * recipes. A direct reference cannot be used here: our recipes are written by
+     * {@link ModRecipeProvider} in a parallel pass, so they are not elements of this provider's
+     * registry set. A tag-backed set resolves nothing now — it is just a name until the datapack
+     * loads — so the advancement names a recipe tag instead (see {@link ModRecipeTagsProvider}); the
+     * lookup creates the tag set on demand, and it is our own registry set that vouches for it.
+     */
+    private HolderGetter<Recipe<?>> recipeGetter;
+
     public ModAdvancements(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries);
     }
@@ -45,11 +57,12 @@ public class ModAdvancements extends FabricAdvancementProvider {
     @Override
     public void generateAdvancement(HolderLookup.Provider registries, Consumer<AdvancementHolder> consumer) {
         this.itemGetter = registries.lookupOrThrow(Registries.ITEM);
+        this.recipeGetter = registries.lookupOrThrow(Registries.RECIPE);
 
         // Root is deliberately ungated: every branch hangs off it, and a child whose parent was
         // conditioned away fails to load.
         AdvancementHolder root = save(consumer, Advancement.Builder.advancement()
-                        .display(ModItems.WILD_COTTON, title("root"), description("root"),
+                        .rootDisplay(ModItems.WILD_COTTON, title("root"), description("root"),
                                 BACKGROUND, AdvancementType.TASK, false, false, false)
                         // No predicate: fires on any inventory change, so the tab appears immediately.
                         // The empty array picks an overload - a bare hasItems() is ambiguous.
@@ -87,7 +100,7 @@ public class ModAdvancements extends FabricAdvancementProvider {
         save(consumer, Advancement.Builder.advancement()
                         .parent(cotton)
                         .display(ModItems.COOKING_OIL, title("cooking_oil"), description("cooking_oil"),
-                                null, AdvancementType.TASK, true, true, false)
+                                AdvancementType.TASK, true, true, false)
                         .addCriterion("cooking_oil", InventoryChangeTrigger.TriggerInstance.hasItems(
                                 ItemPredicate.Builder.item().of(itemGetter, ModItems.COOKING_OIL))),
                 "main/cooking_oil", enabled, new ConfigBooleanCondition(RusticDelightConfig.ENABLE_FRIED_FOODS_ID));
@@ -96,9 +109,9 @@ public class ModAdvancements extends FabricAdvancementProvider {
         save(consumer, Advancement.Builder.advancement()
                         .parent(cotton)
                         .display(net.minecraft.world.item.Items.STRING, title("string"), description("string"),
-                                null, AdvancementType.TASK, true, true, false)
+                                AdvancementType.TASK, true, true, false)
                         .addCriterion("string_from_cotton", RecipeCraftedTrigger.TriggerInstance.craftedItem(
-                                ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, "string_from_cotton_boll")))),
+                                recipe(ModTags.Recipes.STRING_FROM_COTTON))),
                 "main/string", enabled);
     }
 
@@ -134,7 +147,7 @@ public class ModAdvancements extends FabricAdvancementProvider {
         save(consumer, Advancement.Builder.advancement()
                         .parent(pepper)
                         .display(ModItems.RICE_ROLL_ROYALE, title("rice_roll_royale"), description("rice_roll_royale"),
-                                null, AdvancementType.GOAL, true, true, false)
+                                AdvancementType.GOAL, true, true, false)
                         .addCriterion("rice_roll_royale", InventoryChangeTrigger.TriggerInstance.hasItems(
                                 ItemPredicate.Builder.item().of(itemGetter, ModItems.RICE_ROLL_ROYALE))),
                 "main/rice_roll_royale", enabled,
@@ -184,7 +197,7 @@ public class ModAdvancements extends FabricAdvancementProvider {
                                              ResourceCondition... conditions) {
         return save(consumer, Advancement.Builder.advancement()
                         .parent(parent)
-                        .display(icon, title(name), description(name), null, AdvancementType.TASK, true, true, false)
+                        .display(icon, title(name), description(name), AdvancementType.TASK, true, true, false)
                         .addCriterion(name, InventoryChangeTrigger.TriggerInstance.hasItems(match)),
                 "main/" + name, conditions);
     }
@@ -194,7 +207,7 @@ public class ModAdvancements extends FabricAdvancementProvider {
                                      Item icon, AdvancementType type, ConfigBooleanCondition condition, ItemLike... items) {
         Advancement.Builder builder = Advancement.Builder.advancement()
                 .parent(parent)
-                .display(icon, title(name), description(name), null, type, true, true, false)
+                .display(icon, title(name), description(name), type, true, true, false)
                 // One predicate matching any of the items. Passing the items straight to hasItems()
                 // would make a predicate each, and InventoryChangeTrigger requires all of them to
                 // match - i.e. "hold every one at once" rather than "hold any one".
@@ -211,12 +224,24 @@ public class ModAdvancements extends FabricAdvancementProvider {
                                         Item icon, AdvancementType type, ConfigBooleanCondition condition, ItemLike... items) {
         Advancement.Builder builder = Advancement.Builder.advancement()
                 .parent(parent)
-                .display(icon, title(name), description(name), null, type, true, true, false);
+                .display(icon, title(name), description(name), type, true, true, false);
         for (ItemLike item : items) {
             String criterion = BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
             builder.addCriterion(criterion, InventoryChangeTrigger.TriggerInstance.hasItems(item));
         }
         return save(consumer, builder, "main/" + name, condition);
+    }
+
+    /**
+     * One of our recipes, as the single-element recipe set the crafted-item trigger now expects.
+     *
+     * <p>The lookup we are handed only holds the recipes that already exist as registry entries, and
+     * ours are written out by {@link ModRecipeProvider} in a separate pass — so resolving the key
+     * through it would fail. A standalone reference is enough here: the set is serialised by key,
+     * and the game binds it when the datapack loads.
+     */
+    private HolderSet<Recipe<?>> recipe(TagKey<Recipe<?>> tag) {
+        return recipeGetter.getOrThrow(tag);
     }
 
     private static Component title(String name) {

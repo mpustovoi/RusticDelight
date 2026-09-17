@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/fruit_beignet"
+        "recipes": "rusticdelight:item/fruit_beignet"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

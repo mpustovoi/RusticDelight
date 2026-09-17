@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:baked_potato_slices"
+        "recipes": "rusticdelight:baked_potato_slices"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

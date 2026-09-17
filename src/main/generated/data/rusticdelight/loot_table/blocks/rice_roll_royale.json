@@ -1,49 +1,43 @@
 {
   "type": "minecraft:block",
-  "functions": [
-    {
-      "function": "minecraft:explosion_decay"
-    }
-  ],
+  "modifier": {
+    "type": "minecraft:explosion_decay"
+  },
   "pools": [
     {
-      "conditions": [
-        {
-          "block": "rusticdelight:rice_roll_royale",
-          "condition": "minecraft:block_state_property",
-          "properties": {
-            "servings": "8"
-          }
+      "condition": {
+        "type": "minecraft:match_block",
+        "blocks": "rusticdelight:rice_roll_royale",
+        "state": {
+          "servings": "8"
         }
-      ],
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "rusticdelight:rice_roll_royale"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     },
     {
-      "conditions": [
-        {
-          "condition": "minecraft:inverted",
-          "term": {
-            "block": "rusticdelight:rice_roll_royale",
-            "condition": "minecraft:block_state_property",
-            "properties": {
-              "servings": "8"
-            }
+      "condition": {
+        "type": "minecraft:inverted",
+        "term": {
+          "type": "minecraft:match_block",
+          "blocks": "rusticdelight:rice_roll_royale",
+          "state": {
+            "servings": "8"
           }
         }
-      ],
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "minecraft:bowl"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "rusticdelight:blocks/rice_roll_royale"

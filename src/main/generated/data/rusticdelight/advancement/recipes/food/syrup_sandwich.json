@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:syrup_sandwich"
+        "recipes": "rusticdelight:syrup_sandwich"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +57,10 @@ public class ChestLootHelper {
             for (Entry entry : ENTRIES) {
                 if (entry.table.equals(key) && entry.family.isEnabled()) {
                     tableBuilder.pool(LootPool.lootPool()
-                            .setRolls(ConstantValue.exactly(1))
+                            .setRolls(ContextIntProviders.exactly(1))
                             .when(LootItemRandomChanceCondition.randomChance(entry.chance))
                             .add(LootItem.lootTableItem(entry.item)
-                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(entry.count))))
+                                    .apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(entry.count))))
                             .build());
                 }
             }

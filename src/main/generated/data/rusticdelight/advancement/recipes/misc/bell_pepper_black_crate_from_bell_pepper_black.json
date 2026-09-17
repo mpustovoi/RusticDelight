@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:bell_pepper_black_crate_from_bell_pepper_black"
+        "recipes": "rusticdelight:bell_pepper_black_crate_from_bell_pepper_black"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cotton_seeds_from_cotton_seeds_bag"
+        "recipes": "rusticdelight:cotton_seeds_from_cotton_seeds_bag"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

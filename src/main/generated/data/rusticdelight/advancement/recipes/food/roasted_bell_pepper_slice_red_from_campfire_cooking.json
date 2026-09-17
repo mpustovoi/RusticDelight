@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:roasted_bell_pepper_slice_red_from_campfire_cooking"
+        "recipes": "rusticdelight:roasted_bell_pepper_slice_red_from_campfire_cooking"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

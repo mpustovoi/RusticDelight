@@ -16,10 +16,10 @@
     "count": 6,
     "id": "rusticdelight:cooked_calamari"
   },
-  "max_uses": 16.0,
+  "max_uses": 16,
   "reputation_discount": 0.05,
   "wants": {
-    "count": 6.0,
+    "count": 6,
     "id": "rusticdelight:calamari"
   }
 }

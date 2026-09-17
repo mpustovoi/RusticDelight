@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:coffee_cookie"
+        "recipes": "rusticdelight:coffee_cookie"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

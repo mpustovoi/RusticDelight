@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cherry_blossom_pancakes_from_cherry_blossom_pancake"
+        "recipes": "rusticdelight:cherry_blossom_pancakes_from_cherry_blossom_pancake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

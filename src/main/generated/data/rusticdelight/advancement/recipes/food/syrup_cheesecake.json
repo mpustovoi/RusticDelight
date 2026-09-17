@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:syrup_cheesecake"
+        "recipes": "rusticdelight:syrup_cheesecake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

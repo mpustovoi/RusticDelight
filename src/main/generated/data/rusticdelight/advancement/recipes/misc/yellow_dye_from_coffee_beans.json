@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:yellow_dye_from_coffee_beans"
+        "recipes": "rusticdelight:yellow_dye_from_coffee_beans"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -7,9 +7,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -20,9 +18,9 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.*;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import vectorwing.farmersdelight.common.block.PieBlock;
 
 import java.util.concurrent.CompletableFuture;
@@ -37,15 +35,15 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
     public void generate() {
         dropCrop(
                 ModBlocks.COTTON_CROP, CottonCropBlock.AGE, CottonCropBlock.MAX_AGE,
-                ModItems.COTTON_SEEDS, UniformGenerator.between(1.0F, 3.0F),
-                ModItems.COTTON_BOLL, UniformGenerator.between(1.0F, 3.0F));
+                ModItems.COTTON_SEEDS, ContextIntProviders.between(1, 3),
+                ModItems.COTTON_BOLL, ContextIntProviders.between(1, 3));
         dropBellPepperCrop(ModBlocks.BELL_PEPPER_CROP);
         dropPaleBellPepperCrop(ModBlocks.PALE_BELL_PEPPER_CROP);
         dropDarkBellPepperCrop(ModBlocks.DARK_BELL_PEPPER_CROP);
         dropCrop(
                 ModBlocks.COFFEE_CROP, CoffeeCropBlock.AGE, CoffeeCropBlock.MAX_AGE,
-                ModItems.COFFEE_BEANS, UniformGenerator.between(1.0F, 1.0F),
-                ModItems.COFFEE_BEANS, UniformGenerator.between(1.0F, 4.0F));
+                ModItems.COFFEE_BEANS, ContextIntProviders.exactly(1),
+                ModItems.COFFEE_BEANS, ContextIntProviders.between(1, 4));
 
         dropWildCrop(ModBlocks.WILD_COTTON, ModItems.COTTON_SEEDS, ModItems.COTTON_BOLL);
         dropWildCrop(ModBlocks.WILD_BELL_PEPPERS, ModItems.BELL_PEPPER_SEEDS, ModItems.BELL_PEPPER_RED);
@@ -119,7 +117,7 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
         this.add(pottedBlock, createPotFlowerItemTable(flowerBlock));
     }
 
-    private void dropCrop(Block block, IntegerProperty age, int maxAge, ItemLike seedsItem, NumberProvider seedsCount, ItemLike cropItem, NumberProvider cropCount) {
+    private void dropCrop(Block block, IntegerProperty age, int maxAge, ItemLike seedsItem, Holder<ContextIntProvider> seedsCount, ItemLike cropItem, Holder<ContextIntProvider> cropCount) {
         this.add(block, blockParam -> createCropDrops(blockParam, age, maxAge, seedsItem, seedsCount, cropItem, cropCount));
     }
 
@@ -151,13 +149,11 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
         this.add(block, blockParam -> createPancakeDrops(blockParam, pancakeItem));
     }
 
-    private LootTable.Builder createCropDrops(Block cropBlock, IntegerProperty age, int maxAge, ItemLike seedsItem, NumberProvider seedsCount, ItemLike cropItem, NumberProvider cropCount) {
-        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+    private LootTable.Builder createCropDrops(Block cropBlock, IntegerProperty age, int maxAge, ItemLike seedsItem, Holder<ContextIntProvider> seedsCount, ItemLike cropItem, Holder<ContextIntProvider> cropCount) {
 
         // Condition that checks if the crop is fully grown.
-        LootItemCondition.Builder dropGrownCropCondition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(cropBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(age, maxAge));
+        LootItemCondition.Builder dropGrownCropCondition = MatchBlock.blockMatches(this.blocks, cropBlock,
+                StatePropertiesPredicate.Builder.properties().hasProperty(age, maxAge));
 
         return this.applyExplosionDecay(
                 cropBlock,
@@ -187,12 +183,10 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
     }
 
     private LootTable.Builder createBellPepperDrops(Block cropBlock) {
-        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
         // Condition that checks if the crop is fully grown.
-        LootItemCondition.Builder dropGrownCropCondition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(cropBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
+        LootItemCondition.Builder dropGrownCropCondition = MatchBlock.blockMatches(this.blocks, cropBlock,
+                StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
 
         return this.applyExplosionDecay(
                 cropBlock,
@@ -206,7 +200,7 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
                         .withPool(LootPool.lootPool()
                                 .when(dropGrownCropCondition)
                                 .add(LootItem.lootTableItem(ModItems.BELL_PEPPER_SEEDS)
-                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
+                                        .apply(SetItemCountFunction.setCount(ContextIntProviders.between(1, 2)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(enchantments.getOrThrow(Enchantments.FORTUNE)))
                                 )
                         )
@@ -233,11 +227,9 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
     }
 
     private LootTable.Builder createPaleBellPepperDrops(Block cropBlock) {
-        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
-        LootItemCondition.Builder dropGrownCropCondition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(cropBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
+        LootItemCondition.Builder dropGrownCropCondition = MatchBlock.blockMatches(this.blocks, cropBlock,
+                StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
 
         return this.applyExplosionDecay(
                 cropBlock,
@@ -251,7 +243,7 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
                         .withPool(LootPool.lootPool()
                                 .when(dropGrownCropCondition)
                                 .add(LootItem.lootTableItem(ModItems.PALE_BELL_PEPPER_SEEDS)
-                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
+                                        .apply(SetItemCountFunction.setCount(ContextIntProviders.between(1, 2)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(enchantments.getOrThrow(Enchantments.FORTUNE)))
                                 )
                         )
@@ -281,11 +273,9 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
     }
 
     private LootTable.Builder createDarkBellPepperDrops(Block cropBlock) {
-        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
-        LootItemCondition.Builder dropGrownCropCondition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(cropBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
+        LootItemCondition.Builder dropGrownCropCondition = MatchBlock.blockMatches(this.blocks, cropBlock,
+                StatePropertiesPredicate.Builder.properties().hasProperty(BellPepperCropBlock.AGE, BellPepperCropBlock.MAX_AGE));
 
         return this.applyExplosionDecay(
                 cropBlock,
@@ -297,7 +287,7 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
                         .withPool(LootPool.lootPool()
                                 .when(dropGrownCropCondition)
                                 .add(LootItem.lootTableItem(ModItems.DARK_BELL_PEPPER_SEEDS)
-                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
+                                        .apply(SetItemCountFunction.setCount(ContextIntProviders.between(1, 2)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(enchantments.getOrThrow(Enchantments.FORTUNE)))
                                 )
                         )
@@ -331,11 +321,10 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
 
     // Drops 1-9 slices of the matching color (melon-style), never the block itself.
     private void dropSlices(Block block, ItemLike slice) {
-        this.add(block, createSingleItemTable(slice, UniformGenerator.between(1.0F, 9.0F)));
+        this.add(block, createSingleItemTable(slice, ContextIntProviders.between(1, 9)));
     }
 
     private LootTable.Builder createWildCropDrops(Block block, ItemLike seedsItem, ItemLike cropItem) {
-        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
 
         return this.applyExplosionDecay(
                 block,
@@ -376,7 +365,7 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
                     .when(servingsIs(block, servings))
                     .add(LootItem.lootTableItem(pancakeItem)
                             .apply(SetItemCountFunction.setCount(
-                                    ConstantValue.exactly(PancakeBlock.pancakesPresentFor(servings))))));
+                                    ContextIntProviders.exactly(PancakeBlock.pancakesPresentFor(servings))))));
         }
 
         // The plate is only left over once the stack is no longer a whole crafted block.
@@ -387,17 +376,16 @@ public class ModLootTableProvider extends FabricBlockLootSubProvider {
         return this.applyExplosionDecay(block, lootTable);
     }
 
-    private static LootItemCondition.Builder servingsIs(Block block, int servings) {
-        return LootItemBlockStatePropertyCondition.hasBlockStateProperties(block)
-                .setProperties(StatePropertiesPredicate.Builder.properties()
+    private LootItemCondition.Builder servingsIs(Block block, int servings) {
+        return MatchBlock.blockMatches(this.blocks, block,
+                StatePropertiesPredicate.Builder.properties()
                         .hasProperty(PancakeBlock.SERVINGS, servings));
     }
 
     private LootTable.Builder createFoodBlockDrops(Block block, IntegerProperty servings, int defaultServings, ItemLike containerItem) {
         // Condition that checks if any servings have been taken.
-        LootItemCondition.Builder noServingsTaken = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(block)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(servings, defaultServings));
+        LootItemCondition.Builder noServingsTaken = MatchBlock.blockMatches(this.blocks, block,
+                StatePropertiesPredicate.Builder.properties().hasProperty(servings, defaultServings));
 
         LootTable.Builder lootTable = this.applyExplosionDecay(
                 block,

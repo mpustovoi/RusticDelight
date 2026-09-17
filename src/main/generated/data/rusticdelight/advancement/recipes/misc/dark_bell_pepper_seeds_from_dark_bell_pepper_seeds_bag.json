@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:dark_bell_pepper_seeds_from_dark_bell_pepper_seeds_bag"
+        "recipes": "rusticdelight:dark_bell_pepper_seeds_from_dark_bell_pepper_seeds_bag"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

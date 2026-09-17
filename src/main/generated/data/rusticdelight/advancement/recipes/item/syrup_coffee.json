@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/syrup_coffee"
+        "recipes": "rusticdelight:item/syrup_coffee"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

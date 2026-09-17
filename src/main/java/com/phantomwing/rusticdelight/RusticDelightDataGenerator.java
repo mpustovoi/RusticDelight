@@ -28,11 +28,12 @@ public class RusticDelightDataGenerator implements DataGeneratorEntrypoint {
         // 26.1 drives villager trades from data rather than TradeOfferHelper at runtime.
         pack.addProvider(ModVillagerTrades::new);
         pack.addProvider(ModVillagerTradeTagsProvider::new);
+        pack.addProvider(ModRecipeTagsProvider::new);
     }
 
     @Override
     public void buildRegistry(RegistrySetBuilder registryBuilder) {
-        registryBuilder.add(Registries.CONFIGURED_FEATURE, ModConfiguredFeatures::bootstrap);
+        registryBuilder.add(Registries.FEATURE, ModConfiguredFeatures::bootstrap);
         registryBuilder.add(Registries.PLACED_FEATURE, ModPlacedFeatures::bootstrap);
     }
 }

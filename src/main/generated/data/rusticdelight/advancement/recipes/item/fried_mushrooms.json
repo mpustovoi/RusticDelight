@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/fried_mushrooms"
+        "recipes": "rusticdelight:item/fried_mushrooms"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

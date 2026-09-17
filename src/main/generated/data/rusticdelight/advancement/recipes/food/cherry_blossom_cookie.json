@@ -39,7 +39,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cherry_blossom_cookie"
+        "recipes": "rusticdelight:cherry_blossom_cookie"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

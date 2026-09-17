@@ -29,7 +29,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:calamari_roll"
+        "recipes": "rusticdelight:calamari_roll"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

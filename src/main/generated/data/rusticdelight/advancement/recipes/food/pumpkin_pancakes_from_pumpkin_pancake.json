@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:pumpkin_pancakes_from_pumpkin_pancake"
+        "recipes": "rusticdelight:pumpkin_pancakes_from_pumpkin_pancake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

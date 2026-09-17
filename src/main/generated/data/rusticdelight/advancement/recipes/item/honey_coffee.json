@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/honey_coffee"
+        "recipes": "rusticdelight:item/honey_coffee"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

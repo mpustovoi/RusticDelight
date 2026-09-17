@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/pumpkin_coffee"
+        "recipes": "rusticdelight:item/pumpkin_coffee"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

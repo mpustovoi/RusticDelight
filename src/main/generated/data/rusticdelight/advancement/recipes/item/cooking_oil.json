@@ -22,7 +22,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/cooking_oil"
+        "recipes": "rusticdelight:item/cooking_oil"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

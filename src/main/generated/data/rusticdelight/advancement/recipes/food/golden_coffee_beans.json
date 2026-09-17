@@ -29,7 +29,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:golden_coffee_beans"
+        "recipes": "rusticdelight:golden_coffee_beans"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

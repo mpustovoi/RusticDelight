@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:baked_potato_slices_from_smoking"
+        "recipes": "rusticdelight:baked_potato_slices_from_smoking"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

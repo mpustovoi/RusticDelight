@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:calamari_from_calamari_crate"
+        "recipes": "rusticdelight:calamari_from_calamari_crate"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

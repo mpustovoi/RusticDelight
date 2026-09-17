@@ -5,6 +5,7 @@ import com.phantomwing.rusticdelight.RusticDelightConfig;
 import com.phantomwing.rusticdelight.block.custom.PancakeBlock;
 import com.phantomwing.rusticdelight.condition.ConfigBooleanCondition;
 import com.phantomwing.rusticdelight.item.ModItems;
+import com.phantomwing.rusticdelight.potion.ModPotions;
 import com.phantomwing.rusticdelight.tags.CommonTags;
 import com.phantomwing.rusticdelight.tags.ModTags;
 import com.phantomwing.rusticdelight.util.ItemUtils;
@@ -12,10 +13,13 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -23,21 +27,27 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import vectorwing.farmersdelight.common.crafting.CookingPotBookCategory;
+import vectorwing.farmersdelight.data.Recipes;
 import vectorwing.farmersdelight.data.builder.CookingPotRecipeBuilder;
 import vectorwing.farmersdelight.data.builder.CuttingBoardRecipeBuilder;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends FabricRecipeProvider {
     public static final int FAST_COOKING = 100;
     public static final int NORMAL_COOKING = 200;
     public static final int SLOW_COOKING = 400;
+    /** Brewing mixes are generated once per potion container, matching vanilla's brewing provider. */
+    private static final List<Item> POTION_CONTAINERS = List.of(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static final float SMALL_EXP = 0.35F;
     public static final float MEDIUM_EXP = 1.0F;
     public static final float LARGE_EXP = 2.0F;
@@ -56,8 +66,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    protected @NotNull RecipeProvider createRecipeProvider(HolderLookup.@NotNull Provider registryLookup, @NotNull RecipeOutput exporter) {
-        return new RecipeProvider(registryLookup, exporter) {
+    protected @NotNull RecipeProvider createRecipeProvider(HolderLookup.@NotNull Provider registryLookup,
+                                                           @NotNull BootstrapContext<Recipe<?>> recipeOutput,
+                                                           @NotNull BootstrapContext<Advancement> advancementOutput) {
+        // FDR's recipe builders resolve holders through this static context, which normally only its
+        // own data provider fills in. 26.3 made recipes a datapack registry, so an add-on generating
+        // cooking pot / cutting board recipes has to point it at its own bootstrap context.
+        Recipes.recipeContext = recipeOutput;
+
+        return new RecipeProvider(recipeOutput, advancementOutput) {
             final HolderGetter<Item> holderGetter = registryLookup.lookupOrThrow(Registries.ITEM);
 
             @Override
@@ -65,6 +82,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 buildCraftingRecipes(output);
                 buildCuttingRecipes(output);
                 buildCookingRecipes(output);
+                buildBrewingRecipes(output);
             }
 
             private void buildCraftingRecipes(@NotNull RecipeOutput output) {
@@ -976,6 +994,53 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('#', sliceItem)
                         .unlockedBy(getHasName(sliceItem), has(sliceItem))
                         .save(recipeOutput, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, getItemName(pieBlock) + "_from_slices")));
+            }
+
+            /**
+             * 26.3 deleted {@code PotionBrewing} and made brewing data-driven, so the haste recipes
+             * that used to be registered at runtime by {@code ModPotions} are generated here.
+             *
+             * <p>Each mix is emitted once per potion container, and each of our potions also gets the
+             * gunpowder / dragon's breath container transforms — on the old API vanilla applied those
+             * to any potion generically, but a data-driven recipe has to exist per potion.
+             */
+            private void buildBrewingRecipes(@NotNull RecipeOutput output) {
+                // Golden Coffee Beans are the only brewing ingredient, so the coffee family gates these too.
+                RecipeOutput potionOutput = family(output,
+                        RusticDelightConfig.ENABLE_POTIONS_ID, RusticDelightConfig.ENABLE_COFFEE_ID);
+
+                for (Item container : POTION_CONTAINERS) {
+                    brewingMix(potionOutput, container, Potions.AWKWARD, ModItems.GOLDEN_COFFEE_BEANS, ModPotions.HASTE_POTION);
+                    brewingMix(potionOutput, container, ModPotions.HASTE_POTION, Items.REDSTONE, ModPotions.LONG_HASTE_POTION);
+                    brewingMix(potionOutput, container, ModPotions.HASTE_POTION, Items.GLOWSTONE_DUST, ModPotions.STRONG_HASTE_POTION);
+                }
+
+                for (Holder<Potion> potion : List.of(ModPotions.HASTE_POTION, ModPotions.LONG_HASTE_POTION, ModPotions.STRONG_HASTE_POTION)) {
+                    containerTransform(potionOutput, Items.POTION, potion, Items.GUNPOWDER, Items.SPLASH_POTION);
+                    containerTransform(potionOutput, Items.SPLASH_POTION, potion, Items.DRAGON_BREATH, Items.LINGERING_POTION);
+                }
+            }
+
+            private void brewingMix(RecipeOutput output, Item container, Holder<Potion> from, Item reagent, Holder<Potion> to) {
+                BrewingRecipeBuilder.brewingMix(container, from, reagent, to)
+                        .save(output, brewingId(container, to, reagent));
+            }
+
+            private void containerTransform(RecipeOutput output, Item container, Holder<Potion> potion, Item reagent, Item result) {
+                BrewingRecipeBuilder.brewingContainerTransform(container, potion, reagent, result)
+                        .save(output, brewingId(result, potion, reagent));
+            }
+
+            /**
+             * {@code BrewingRecipeBuilder.defaultId()} takes its namespace from the container item, so
+             * it would land these under {@code minecraft:} — where datagen, restricted to this mod id,
+             * drops them. Build the same shape of name under our own namespace instead.
+             */
+            private ResourceKey<Recipe<?>> brewingId(Item container, Holder<Potion> potion, Item reagent) {
+                String name = getItemName(container)
+                        + "_" + potion.unwrapKey().orElseThrow().identifier().getPath()
+                        + "_from_" + getItemName(reagent);
+                return ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
             }
 
             private String getRecipeName(ItemLike item, ItemLike result) {

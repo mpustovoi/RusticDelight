@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/milk_coffee"
+        "recipes": "rusticdelight:item/milk_coffee"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

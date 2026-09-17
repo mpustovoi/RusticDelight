@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/fried_fish"
+        "recipes": "rusticdelight:item/fried_fish"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

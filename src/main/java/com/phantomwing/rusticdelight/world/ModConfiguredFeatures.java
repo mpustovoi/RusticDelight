@@ -19,16 +19,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
+import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
-import vectorwing.farmersdelight.common.registry.ModBiomeFeatures;
-import vectorwing.farmersdelight.common.world.configuration.InOrderFeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.OffsetPlacement;
+import vectorwing.farmersdelight.common.world.feature.InOrderFeature;
 
 import java.util.List;
 
@@ -45,15 +43,18 @@ import java.util.List;
  * FDR's own wild crops sparse in grass biomes.
  */
 public class ModConfiguredFeatures {
-    public static ResourceKey<ConfiguredFeature<?, ?>> WILD_COTTON_KEY = registerKey("wild_cotton");
-    public static ResourceKey<ConfiguredFeature<?, ?>> WILD_BELL_PEPPERS_KEY = registerKey("wild_bell_peppers");
-    public static ResourceKey<ConfiguredFeature<?, ?>> WILD_COFFEE_KEY = registerKey("wild_coffee");
-    public static ResourceKey<ConfiguredFeature<?, ?>> BELL_PEPPER_BLOCK_PATCH_KEY = registerKey("bell_pepper_block_patch");
+    /** One block up — the cell checked for "is the space above free?". */
+    private static final BlockPos ABOVE = new BlockPos(0, 1, 0);
 
-    public static void bootstrap(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+    public static ResourceKey<Feature> WILD_COTTON_KEY = registerKey("wild_cotton");
+    public static ResourceKey<Feature> WILD_BELL_PEPPERS_KEY = registerKey("wild_bell_peppers");
+    public static ResourceKey<Feature> WILD_COFFEE_KEY = registerKey("wild_coffee");
+    public static ResourceKey<Feature> BELL_PEPPER_BLOCK_PATCH_KEY = registerKey("bell_pepper_block_patch");
+
+    public static void bootstrap(BootstrapContext<Feature> context) {
         // Cotton: short dry grass evokes the wispy, parched look of a cotton field.
         // Bell peppers and coffee live in jungles — bushes match the dense undergrowth.
-        registerWildCropPatch(context, WILD_COTTON_KEY, BlockStateProvider.simple(ModBlocks.WILD_COTTON), Blocks.SHORT_DRY_GRASS);
+        registerWildCropPatch(context, WILD_COTTON_KEY, BlockStateProvider.of(ModBlocks.WILD_COTTON), Blocks.SHORT_DRY_GRASS);
         // Each block in a wild bell pepper patch has a 5% chance to roll the pale or the dark variant.
         registerWildCropPatch(context, WILD_BELL_PEPPERS_KEY, new WeightedStateProvider(
                 WeightedList.<BlockState>builder()
@@ -62,22 +63,19 @@ public class ModConfiguredFeatures {
                         .add(ModBlocks.WILD_DARK_BELL_PEPPERS.defaultBlockState(), 5)
                         .build()
         ), Blocks.BUSH);
-        registerWildCropPatch(context, WILD_COFFEE_KEY, BlockStateProvider.simple(ModBlocks.WILD_COFFEE), Blocks.BUSH);
+        registerWildCropPatch(context, WILD_COFFEE_KEY, BlockStateProvider.of(ModBlocks.WILD_COFFEE), Blocks.BUSH);
 
         registerBellPepperBlockPatch(context, BELL_PEPPER_BLOCK_PATCH_KEY);
     }
 
-    private static void registerWildCropPatch(BootstrapContext<ConfiguredFeature<?, ?>> context,
-                                              ResourceKey<ConfiguredFeature<?, ?>> key, BlockStateProvider cropProvider, Block ambianceBlock) {
+    private static void registerWildCropPatch(BootstrapContext<Feature> context,
+                                              ResourceKey<Feature> key, BlockStateProvider cropProvider, Block ambianceBlock) {
         HolderSet<PlacedFeature> subFeatures = HolderSet.direct(
                 coarseDirtSubFeature(),
                 cropSubFeature(cropProvider),
                 ambianceSubFeature(ambianceBlock)
         );
-        context.register(key, new ConfiguredFeature<>(
-                ModBiomeFeatures.IN_ORDER.get(),
-                new InOrderFeatureConfiguration(subFeatures)
-        ));
+        context.register(key, new InOrderFeature(subFeatures));
     }
 
     /** Sprinkles coarse dirt onto an exposed dirt-tagged surface. */
@@ -85,10 +83,12 @@ public class ModConfiguredFeatures {
         return Holder.direct(new PlacedFeature(
                 Holder.direct(simpleBlock(Blocks.COARSE_DIRT)),
                 List.of(
-                        RandomOffsetPlacement.of(ConstantInt.of(0), ConstantInt.of(1)),
-                        RandomOffsetPlacement.of(TrapezoidInt.of(-6, 6, 0), TrapezoidInt.of(-3, 3, 0)),
+                        OffsetPlacement.of(ConstantInt.of(0), ConstantInt.of(1)),
+                        OffsetPlacement.of(TrapezoidInt.of(-6, 6, 0), TrapezoidInt.of(-3, 3, 0)),
                         BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
-                                BlockPredicate.replaceable(new BlockPos(0, 1, 0)),
+                                // 26.3 dropped the offset overload of replaceable(); a single-cell
+                                // volumeMatch checks the same "block above is replaceable" position.
+                                BlockPredicate.volumeMatch(ABOVE, ABOVE, BlockPredicate.replaceable()),
                                 BlockPredicate.matchesTag(BlockTags.SUBSTRATE_OVERWORLD)
                         ))
                 )
@@ -100,7 +100,7 @@ public class ModConfiguredFeatures {
         return Holder.direct(new PlacedFeature(
                 Holder.direct(simpleBlock(cropProvider)),
                 List.of(
-                        RandomOffsetPlacement.of(TrapezoidInt.of(-4, 4, 0), TrapezoidInt.of(-3, 3, 0)),
+                        OffsetPlacement.of(TrapezoidInt.of(-4, 4, 0), TrapezoidInt.of(-3, 3, 0)),
                         BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
                                 BlockPredicate.matchesBlocks(Blocks.AIR),
                                 BlockPredicate.matchesTag(new BlockPos(0, -1, 0), BlockTags.SUBSTRATE_OVERWORLD)
@@ -114,7 +114,7 @@ public class ModConfiguredFeatures {
         return Holder.direct(new PlacedFeature(
                 Holder.direct(simpleBlock(ambianceBlock)),
                 List.of(
-                        RandomOffsetPlacement.of(TrapezoidInt.of(-6, 6, 0), TrapezoidInt.of(-3, 3, 0)),
+                        OffsetPlacement.of(TrapezoidInt.of(-6, 6, 0), TrapezoidInt.of(-3, 3, 0)),
                         BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
                                 BlockPredicate.matchesBlocks(Blocks.AIR),
                                 BlockPredicate.matchesTag(new BlockPos(0, -1, 0), BlockTags.SUBSTRATE_OVERWORLD)
@@ -132,8 +132,8 @@ public class ModConfiguredFeatures {
      * the placement chain — see {@code ModPlacedFeatures.registerBellPepperBlockPatch}. This is the
      * same shape vanilla's own {@code patch_pumpkin} uses on 26.1.
      */
-    private static void registerBellPepperBlockPatch(BootstrapContext<ConfiguredFeature<?, ?>> context,
-                                                     ResourceKey<ConfiguredFeature<?, ?>> key) {
+    private static void registerBellPepperBlockPatch(BootstrapContext<Feature> context,
+                                                     ResourceKey<Feature> key) {
         WeightedStateProvider provider = new WeightedStateProvider(
                 WeightedList.<BlockState>builder()
                         .add(ModBlocks.BELL_PEPPER_RED_BLOCK.defaultBlockState(), 90)
@@ -147,20 +147,18 @@ public class ModConfiguredFeatures {
                         .add(ModBlocks.BELL_PEPPER_BLACK_BLOCK.defaultBlockState(), 5)
                         .build()
         );
-        context.register(key, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(provider)));
+        context.register(key, new SimpleBlockFeature(provider));
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static ConfiguredFeature<?, ?> simpleBlock(Block block) {
-        return simpleBlock(BlockStateProvider.simple(block));
+    private static Feature simpleBlock(Block block) {
+        return simpleBlock(BlockStateProvider.of(block));
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static ConfiguredFeature<?, ?> simpleBlock(BlockStateProvider provider) {
-        return new ConfiguredFeature(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(provider));
+    private static Feature simpleBlock(BlockStateProvider provider) {
+        return new SimpleBlockFeature(provider);
     }
 
-    private static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {
-        return ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
+    private static ResourceKey<Feature> registerKey(String name) {
+        return ResourceKey.create(Registries.FEATURE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
     }
 }

@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/coffee_braised_beef"
+        "recipes": "rusticdelight:item/coffee_braised_beef"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

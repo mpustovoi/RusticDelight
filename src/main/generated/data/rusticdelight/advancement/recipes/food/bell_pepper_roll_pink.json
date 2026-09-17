@@ -29,7 +29,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:bell_pepper_roll_pink"
+        "recipes": "rusticdelight:bell_pepper_roll_pink"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

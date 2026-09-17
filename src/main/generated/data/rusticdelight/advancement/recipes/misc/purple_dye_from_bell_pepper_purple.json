@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:purple_dye_from_bell_pepper_purple"
+        "recipes": "rusticdelight:purple_dye_from_bell_pepper_purple"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

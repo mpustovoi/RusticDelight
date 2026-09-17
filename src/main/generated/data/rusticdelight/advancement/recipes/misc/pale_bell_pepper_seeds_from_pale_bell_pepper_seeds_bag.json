@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:pale_bell_pepper_seeds_from_pale_bell_pepper_seeds_bag"
+        "recipes": "rusticdelight:pale_bell_pepper_seeds_from_pale_bell_pepper_seeds_bag"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:roasted_coffee_beans"
+        "recipes": "rusticdelight:roasted_coffee_beans"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

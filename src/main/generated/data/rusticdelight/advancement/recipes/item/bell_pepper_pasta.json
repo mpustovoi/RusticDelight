@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/bell_pepper_pasta"
+        "recipes": "rusticdelight:item/bell_pepper_pasta"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

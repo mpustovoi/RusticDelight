@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:blue_dye_from_bell_pepper_blue"
+        "recipes": "rusticdelight:blue_dye_from_bell_pepper_blue"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

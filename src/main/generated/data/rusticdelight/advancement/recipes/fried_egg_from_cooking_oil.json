@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:fried_egg_from_cooking_oil"
+        "recipes": "rusticdelight:fried_egg_from_cooking_oil"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

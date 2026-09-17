@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:bell_pepper_yellow_block_from_bell_pepper_slice_yellow"
+        "recipes": "rusticdelight:bell_pepper_yellow_block_from_bell_pepper_slice_yellow"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

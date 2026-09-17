@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/fried_calamari"
+        "recipes": "rusticdelight:item/fried_calamari"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:pink_dye_from_bell_pepper_pink"
+        "recipes": "rusticdelight:pink_dye_from_bell_pepper_pink"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

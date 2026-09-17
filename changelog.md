@@ -34,7 +34,7 @@ From colorful bell peppers to cozy cups of coffee, Rustic Delight 1.7 is packed 
 - Added Ukrainian translations (thank you hikarosato!)
 
 ### Changes
-- Updated Farmer's Delight Refabricated to 3.6.6 (now the minimum required version)
+- Updated Farmer's Delight Refabricated to 3.6.25 (now the minimum required version)
 - Updated Japanese translations (thank you HayaKoh!)
 - You no longer need a knife to get a single pancake: Pancakes are now taken from the block by right-clicking, and go straight into your inventory
 - Breaking a pancake block now drops the remaining pancakes as individual pancake items

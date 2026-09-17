@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cherry_blossom_cheesecake_from_slices"
+        "recipes": "rusticdelight:cherry_blossom_cheesecake_from_slices"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

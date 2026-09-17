@@ -1,49 +1,43 @@
 {
   "type": "minecraft:block",
-  "functions": [
-    {
-      "function": "minecraft:explosion_decay"
-    }
-  ],
+  "modifier": {
+    "type": "minecraft:explosion_decay"
+  },
   "pools": [
     {
-      "conditions": [
-        {
-          "block": "rusticdelight:pale_bell_pepper_medley",
-          "condition": "minecraft:block_state_property",
-          "properties": {
-            "servings": "3"
-          }
+      "condition": {
+        "type": "minecraft:match_block",
+        "blocks": "rusticdelight:pale_bell_pepper_medley",
+        "state": {
+          "servings": "3"
         }
-      ],
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "rusticdelight:pale_bell_pepper_medley"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     },
     {
-      "conditions": [
-        {
-          "condition": "minecraft:inverted",
-          "term": {
-            "block": "rusticdelight:pale_bell_pepper_medley",
-            "condition": "minecraft:block_state_property",
-            "properties": {
-              "servings": "3"
-            }
+      "condition": {
+        "type": "minecraft:inverted",
+        "term": {
+          "type": "minecraft:match_block",
+          "blocks": "rusticdelight:pale_bell_pepper_medley",
+          "state": {
+            "servings": "3"
           }
         }
-      ],
+      },
       "entries": [
         {
           "type": "minecraft:item",
           "name": "minecraft:bowl"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "rusticdelight:blocks/pale_bell_pepper_medley"

@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/stuffed_bell_pepper_orange"
+        "recipes": "rusticdelight:item/stuffed_bell_pepper_orange"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

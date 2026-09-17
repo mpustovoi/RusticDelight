@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:pancakes"
+        "recipes": "rusticdelight:pancakes"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

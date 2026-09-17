@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:white_dye_from_bell_pepper_white"
+        "recipes": "rusticdelight:white_dye_from_bell_pepper_white"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

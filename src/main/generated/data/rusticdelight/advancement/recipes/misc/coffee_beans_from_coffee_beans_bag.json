@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:coffee_beans_from_coffee_beans_bag"
+        "recipes": "rusticdelight:coffee_beans_from_coffee_beans_bag"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

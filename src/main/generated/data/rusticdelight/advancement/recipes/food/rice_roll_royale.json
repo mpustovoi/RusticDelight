@@ -42,7 +42,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:rice_roll_royale"
+        "recipes": "rusticdelight:rice_roll_royale"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

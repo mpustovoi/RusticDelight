@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:chocolate_pancake_from_chocolate_pancakes"
+        "recipes": "rusticdelight:chocolate_pancake_from_chocolate_pancakes"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -17,8 +17,6 @@ import net.minecraft.world.item.trading.TradeCost;
 import net.minecraft.world.item.trading.VillagerTrade;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -130,33 +128,30 @@ public class ModVillagerTrades extends FabricDynamicRegistryProvider {
 
     /** Sells {@code count} of {@code item} for 1 emerald. */
     private static VillagerTrade emeraldsFor(ItemLike item, int count, int maxUses, int xp) {
-        return new VillagerTrade(
+        return VillagerTrade.builder(
                 new TradeCost(item.asItem(), count),
                 new ItemStackTemplate(Items.EMERALD),
-                maxUses, xp, PRICE_MULTIPLIER,
-                Optional.empty(), List.of()
-        );
+                maxUses, xp, PRICE_MULTIPLIER
+        ).build();
     }
 
     /** Buys {@code outputCount} of {@code item} for {@code emeraldCost} emeralds. */
     private static VillagerTrade itemsForEmeralds(ItemLike item, int outputCount, int emeraldCost, int maxUses, int xp) {
-        return new VillagerTrade(
+        return VillagerTrade.builder(
                 new TradeCost(Items.EMERALD, emeraldCost),
                 new ItemStackTemplate(item.asItem(), outputCount),
-                maxUses, xp, PRICE_MULTIPLIER,
-                Optional.empty(), List.of()
-        );
+                maxUses, xp, PRICE_MULTIPLIER
+        ).build();
     }
 
     /** Compound trade: {@code count1} of {@code cost1} + {@code count2} of {@code cost2} -> {@code outputCount} of {@code output}. */
     private static VillagerTrade compoundTrade(ItemLike cost1, int count1, ItemLike cost2, int count2, ItemLike output, int outputCount, int maxUses, int xp) {
-        return new VillagerTrade(
+        return VillagerTrade.builder(
                 new TradeCost(cost1.asItem(), count1),
-                Optional.of(new TradeCost(cost2.asItem(), count2)),
+                new TradeCost(cost2.asItem(), count2),
                 new ItemStackTemplate(output.asItem(), outputCount),
-                maxUses, xp, PRICE_MULTIPLIER,
-                Optional.empty(), List.of()
-        );
+                maxUses, xp, PRICE_MULTIPLIER
+        ).build();
     }
 
     private static ResourceKey<VillagerTrade> key(String path) {

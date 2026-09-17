@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/calamari_soup"
+        "recipes": "rusticdelight:item/calamari_soup"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

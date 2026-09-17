@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version '1.17.12'
+	id 'net.fabricmc.fabric-loom' version '1.18.2'
 	id 'maven-publish'
 	id 'me.modmuss50.mod-publish-plugin' version '2.0.0'
 }
@@ -25,7 +25,18 @@ repositories {
 	mavenLocal()
 
 	maven {
-		// Farmer's Delight Refabricated
+		// Farmer's Delight Refabricated. The Greenhouse maven stopped publishing after
+		// 26.2-3.6.7 (2026-06-30), so releases from 3.6.8 on — including every 26.3 build —
+		// are only on Modrinth. Modrinth's maven serves them as maven.modrinth:<slug>:<version>.
+		name = "Modrinth Maven"
+		url = 'https://api.modrinth.com/maven/'
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
+
+	maven {
+		// Kept for older FDR releases; no 26.3 artifacts here (see above).
 		name = "Greenhouse Maven"
 		url = 'https://maven.greenhouse.lgbt/releases/'
 	}
@@ -63,7 +74,8 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
 
 	// Farmer's Delight Refabricated — published against base MC (no per-patch artifacts).
-	implementation("vectorwing:FarmersDelight:${minecraft_min_version}-${farmersdelight_version}+refabricated") {
+	// Sourced from the Modrinth maven, whose version strings are "<mc>-<fdr>" (no +refabricated suffix).
+	implementation("maven.modrinth:farmers-delight-refabricated:${minecraft_min_version}-${farmersdelight_version}") {
 		exclude(group: "net.fabricmc")
 	}
 
@@ -72,12 +84,13 @@ dependencies {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 
-	// JEI / REI — REI has no 26.1 build yet (last: 21.11.814 for 1.21.11).
+	// JEI / REI — REI has no 26.3 build yet (last: 21.11.814 for 1.21.11).
 	runtimeOnly("mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}")
 	//runtimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}")
 
-	// Appleskin — published against base MC.
-	runtimeOnly("squeek.appleskin:appleskin-fabric:mc${minecraft_min_version}-${appleskin_version}")
+	// Appleskin — published against base MC. No 26.3 build yet (last: mc26.2-3.0.10), so this
+	// dev-only runtime dep stays off until one lands.
+	//runtimeOnly("squeek.appleskin:appleskin-fabric:mc${minecraft_min_version}-${appleskin_version}")
 }
 
 processResources {
@@ -90,12 +103,12 @@ processResources {
 			mod_version          : version,
 			fabric_loader_version: fabric_loader_version,
 			fabric_api_version   : fabric_api_version,
-			// Stripped of the +build suffix for a clean dependency predicate (0.152.2+26.2 -> 0.152.2).
+			// Stripped of the +build suffix for a clean dependency predicate (0.160.7+26.3 -> 0.160.7).
 			fabric_api_dep       : fabric_api_version.replaceAll(/\+.*$/, ''),
 			cloth_config_version : cloth_config_version,
 
-			// FDR declares its version as "26.2-3.6.6+refabricated", which semver reads as version
-			// 26.2 with prerelease 3.6.6, so a bare ">=3.6.6" compares against the 26.2 and admits
+			// FDR declares its version as "26.3-3.6.25+refabricated", which semver reads as version
+			// 26.3 with prerelease 3.6.25, so a bare ">=3.6.25" compares against the 26.3 and admits
 			// every FDR built for this Minecraft version. Match the full coordinate string instead
 			// so the bound actually constrains the Farmer's Delight version.
 			farmersdelight_dep   : "${minecraft_min_version}-${farmersdelight_version}"

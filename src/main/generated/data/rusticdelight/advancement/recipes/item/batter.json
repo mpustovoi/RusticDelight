@@ -31,7 +31,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/batter"
+        "recipes": "rusticdelight:item/batter"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

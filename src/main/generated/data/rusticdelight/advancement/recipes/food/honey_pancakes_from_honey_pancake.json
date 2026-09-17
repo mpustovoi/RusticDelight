@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:honey_pancakes_from_honey_pancake"
+        "recipes": "rusticdelight:honey_pancakes_from_honey_pancake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

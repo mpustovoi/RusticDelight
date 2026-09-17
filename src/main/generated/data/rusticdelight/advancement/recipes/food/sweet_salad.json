@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:sweet_salad"
+        "recipes": "rusticdelight:sweet_salad"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

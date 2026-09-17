@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:orange_dye_from_bell_pepper_orange"
+        "recipes": "rusticdelight:orange_dye_from_bell_pepper_orange"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -49,7 +49,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cherry_blossom_roll"
+        "recipes": "rusticdelight:cherry_blossom_roll"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

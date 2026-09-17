@@ -25,7 +25,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:dark_bell_pepper_medley"
+        "recipes": "rusticdelight:dark_bell_pepper_medley"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

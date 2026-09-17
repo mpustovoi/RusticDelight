@@ -2,6 +2,7 @@ package com.phantomwing.rusticdelight.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -105,7 +106,7 @@ public class PancakeBlock extends Block {
         if (!level.isClientSide()) {
             ItemStack serving = this.getServingItem();
             if (!player.getInventory().add(serving)) {
-                player.drop(serving, false);
+                player.drop(serving, false, Prediction.SERVER_ONLY);
             }
         }
 

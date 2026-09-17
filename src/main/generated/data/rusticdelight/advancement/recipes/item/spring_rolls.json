@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:item/spring_rolls"
+        "recipes": "rusticdelight:item/spring_rolls"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

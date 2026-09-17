@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:cooked_calamari_slice_from_smoking"
+        "recipes": "rusticdelight:cooked_calamari_slice_from_smoking"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

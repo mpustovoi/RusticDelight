@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rusticdelight:roasted_bell_pepper_purple_from_smoking"
+        "recipes": "rusticdelight:roasted_bell_pepper_purple_from_smoking"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

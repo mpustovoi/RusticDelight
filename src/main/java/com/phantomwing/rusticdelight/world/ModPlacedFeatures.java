@@ -15,14 +15,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.valueproviders.TrapezoidInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.BlockPredicateFilter;
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement;
+import net.minecraft.world.level.levelgen.placement.OffsetPlacement;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> BELL_PEPPER_BLOCK_PATCH_PLACED_KEY = registerKey("bell_pepper_block_patch_placed");
 
     public static void bootstrap(BootstrapContext<PlacedFeature> context) {
-        HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
+        HolderGetter<Feature> configuredFeatures = context.lookup(Registries.FEATURE);
 
         registerWildCrop(context, configuredFeatures, WILD_COTTON_PLACED_KEY, ModConfiguredFeatures.WILD_COTTON_KEY, RusticDelightConfig.CHANCE_WILD_COTTON_ID);
         registerWildCrop(context, configuredFeatures, WILD_BELL_PEPPERS_PLACED_KEY, ModConfiguredFeatures.WILD_BELL_PEPPERS_KEY, RusticDelightConfig.CHANCE_WILD_BELL_PEPPERS_ID);
@@ -53,7 +53,7 @@ public class ModPlacedFeatures {
      * noFluid() matters because water is replaceable — without it these spawn submerged.
      */
     private static void registerBellPepperBlockPatch(BootstrapContext<PlacedFeature> context,
-                                                     HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures) {
+                                                     HolderGetter<Feature> configuredFeatures) {
         register(context, BELL_PEPPER_BLOCK_PATCH_PLACED_KEY,
                 configuredFeatures.getOrThrow(ModConfiguredFeatures.BELL_PEPPER_BLOCK_PATCH_KEY),
                 List.of(
@@ -62,11 +62,11 @@ public class ModPlacedFeatures {
                         PlacementUtils.HEIGHTMAP,
                         BiomeFilter.biome(),
                         CountPlacement.of(48),
-                        RandomOffsetPlacement.of(TrapezoidInt.of(-7, 7, 0), TrapezoidInt.of(-3, 3, 0)),
+                        OffsetPlacement.of(TrapezoidInt.of(-7, 7, 0), TrapezoidInt.of(-3, 3, 0)),
                         BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
                                 BlockPredicate.replaceable(),
                                 BlockPredicate.noFluid(),
-                                BlockPredicate.matchesBlocks(Direction.DOWN.getUnitVec3i(), Blocks.GRASS_BLOCK)
+                                BlockPredicate.matchesBlocks(Direction.DOWN, Blocks.GRASS_BLOCK)
                         ))
                 ));
     }
@@ -76,7 +76,7 @@ public class ModPlacedFeatures {
      * count the whole patch gets a single placement attempt per chunk and almost never survives
      * its block predicates.
      */
-    private static void registerWildCrop(BootstrapContext<PlacedFeature> context, HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures, ResourceKey<PlacedFeature> placedFeatureKey, ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureKey, String configuredChanceId) {
+    private static void registerWildCrop(BootstrapContext<PlacedFeature> context, HolderGetter<Feature> configuredFeatures, ResourceKey<PlacedFeature> placedFeatureKey, ResourceKey<Feature> configuredFeatureKey, String configuredChanceId) {
         register(context, placedFeatureKey, configuredFeatures.getOrThrow(configuredFeatureKey), List.of(ConfigurableRarityFilter.withConfigurableChance(configuredChanceId),
                 InSquarePlacement.spread(), CountPlacement.of(64), PlacementUtils.HEIGHTMAP, BiomeFilter.biome())
         );
@@ -86,7 +86,7 @@ public class ModPlacedFeatures {
         return ResourceKey.create(Registries.PLACED_FEATURE, Identifier.fromNamespaceAndPath(RusticDelight.MOD_ID, name));
     }
 
-    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key, Holder<ConfiguredFeature<?, ?>> configuration, List<PlacementModifier> modifiers) {
+    private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key, Holder<Feature> configuration, List<PlacementModifier> modifiers) {
         context.register(key, new PlacedFeature(configuration, List.copyOf(modifiers)));
     }
 }
